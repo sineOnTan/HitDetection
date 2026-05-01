@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define space << " "
 
 // Determines the max coords of the map to avoid unnecessary computations.
 int max_coords = 1e4;
@@ -21,45 +22,51 @@ struct position {
 // Aims to find the smallest hypotenuse to exit a plane defined by the bounding box then 
 // calculate the position the line would leave the box.
 position getNextBox(float yaw, float pitch, position pos) {
+    float degs_to_rads = M_PI / 180.0f;
+
+    float sin_yaw = sin(yaw * degs_to_rads);
+    float cos_yaw = cos(yaw * degs_to_rads);
+    float sin_pitch = cos(pitch * degs_to_rads);
+
     float x_hypot_length = INT_MAX;
     if (yaw < 90 or yaw > 270) {
-        x_hypot_length = ((pos.x / bound_size) + 1) * bound_size / sin(yaw * M_PI / 180.0f);
+        x_hypot_length = ((floor(pos.x / bound_size + 1) * bound_size) - pos.x) / sin_yaw;
     } else if (yaw < 90 or yaw > 270) {
-        x_hypot_length = ((pos.x / bound_size)) * bound_size / sin(yaw * M_PI / 180.0f);
+        x_hypot_length = (pos.x - (floor(pos.x / bound_size) * bound_size)) / sin_yaw;
     }
 
     float y_hypot_length = INT_MAX;
     if (yaw < 180) {
-        y_hypot_length = ((pos.y / bound_size) + 1) * bound_size / cos(yaw * M_PI / 180.0f);
+        y_hypot_length = ((floor(pos.y / bound_size + 1) * bound_size) - pos.y) / cos_yaw;
     } else if (yaw > 180) {
-        y_hypot_length = ((pos.y / bound_size)) * bound_size / cos(yaw * M_PI / 180.0f);
+        y_hypot_length = (pos.y - (floor(pos.y / bound_size) * bound_size)) / cos_yaw;
     }
 
     float z_hypot_length = INT_MAX;
     if (pitch > 0) {
-        z_hypot_length = ((pos.z / bound_size) + 1) * bound_size / sin(pitch * M_PI / 180.0f);
+        z_hypot_length = ((floor(pos.z / bound_size + 1) * bound_size) - pos.z) / sin_pitch;
     } else if (pitch < 0) {
-        z_hypot_length = ((pos.z / bound_size)) * bound_size / sin(pitch * M_PI / 180.0f);
+        z_hypot_length = (pos.z - (floor(pos.z / bound_size) * bound_size)) / sin_pitch;
     }
 
-    float hypot_length = x_hypot_length;
-    hypot_length = max(hypot_length, y_hypot_length);
-    hypot_length = max(hypot_length, z_hypot_length);
+    float hypot_length = abs(x_hypot_length);
+    hypot_length = min(hypot_length, abs(y_hypot_length));
+    hypot_length = min(hypot_length, abs(z_hypot_length));
 
     position res;
 
-    if (x_hypot_length >= y_hypot_length and x_hypot_length >= z_hypot_length) {
-        res.x = ceil(pos.x + sin(yaw * M_PI / 180.0f) * x_hypot_length);
-        res.y = (pos.y + cos(yaw * M_PI / 180.0f) * x_hypot_length);
-        res.z = (pos.z + sin(pitch * M_PI / 180.0f) * x_hypot_length);
-    } else if (y_hypot_length >= x_hypot_length and y_hypot_length >= z_hypot_length) {
-        res.x = (pos.x + sin(yaw * M_PI / 180.0f) * y_hypot_length);
-        res.y = ceil(pos.y + cos(yaw * M_PI / 180.0f) * y_hypot_length);
-        res.z = (pos.z + sin(pitch * M_PI / 180.0f) * y_hypot_length);
+    if (abs(x_hypot_length) == hypot_length) {
+        res.x = round(pos.x + sin_yaw * hypot_length);
+        res.y = (pos.y + cos_yaw * hypot_length);
+        res.z = (pos.z + sin_pitch * hypot_length);
+    } else if (abs(y_hypot_length) == hypot_length) {
+        res.x = (pos.x + sin_yaw * hypot_length);
+        res.y = round(pos.y + cos_yaw * hypot_length);
+        res.z = (pos.z + sin_pitch * hypot_length);
     } else {
-        res.x = (pos.x + sin(yaw * M_PI / 180.0f) * z_hypot_length);
-        res.y = (pos.y + cos(yaw * M_PI / 180.0f) * z_hypot_length);
-        res.z = ceil(pos.z + sin(pitch * M_PI / 180.0f) * z_hypot_length);
+        res.x = (pos.x + sin_yaw * hypot_length);
+        res.y = (pos.y + cos_yaw * hypot_length);
+        res.z = round(pos.z + sin_pitch * hypot_length);
     }
 
     return res;
@@ -79,9 +86,26 @@ struct cameraAngle {
 
     vector<object> checkCollisions() {
         auto cur_pos = this->pos;
+        vector<object> res;
         while(checkContinuePath(cur_pos)) {
             // Check entities in partition;
             cur_pos = getNextBox(yaw, pitch, pos);
         }
+        return res;
     }
 };
+
+int main () {
+    position pos;
+    pos.x = 5;
+    pos.y = 10;
+    pos.z = 2;
+    float pitch = 45;
+    float yaw = 80;
+    auto start = std::chrono::high_resolution_clock::now();
+    getNextBox(yaw, pitch, pos);
+    auto finish = std::chrono::high_resolution_clock::now();
+    cout << std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() << endl;
+
+    return 0;
+}
