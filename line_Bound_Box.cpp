@@ -18,6 +18,8 @@ struct position {
 };
 
 // The unique ranges for yaw and pitch are to avoid division by 0 problems
+// Aims to find the smallest hypotenuse to exit a plane defined by the bounding box then 
+// calculate the position the line would leave the box.
 position getNextBox(float yaw, float pitch, position pos) {
     float x_hypot_length = INT_MAX;
     if (yaw < 90 or yaw > 270) {
@@ -59,10 +61,11 @@ position getNextBox(float yaw, float pitch, position pos) {
         res.y = (pos.y + cos(yaw * M_PI / 180.0f) * z_hypot_length);
         res.z = ceil(pos.z + sin(pitch * M_PI / 180.0f) * z_hypot_length);
     }
-    
+
     return res;
 }
 
+// Checks the next line is in the plane
 bool checkContinuePath(position pos) {
     if (pos.x >= max_coords or pos.y >= max_coords or pos.z >= max_coords) return false;
     else if (pos.x <= 0 or pos.y <= 0 or pos.z <= 0) return false;
