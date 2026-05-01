@@ -53,7 +53,7 @@ position getNextBox(float yaw, float pitch, position pos) {
     hypot_length = min(hypot_length, abs(y_hypot_length));
     hypot_length = min(hypot_length, abs(z_hypot_length));
 
-    cout << x_hypot_length space << y_hypot_length space << z_hypot_length space << hypot_length << endl;
+    // cout << x_hypot_length space << y_hypot_length space << z_hypot_length space << hypot_length << endl;
 
     position res;
 
@@ -71,7 +71,7 @@ position getNextBox(float yaw, float pitch, position pos) {
         res.z = round(pos.z + sin_pitch * hypot_length);
     }
 
-    cout << res.x space << res.y space << res.z << endl;
+    // cout << res.x space << res.y space << res.z << endl;
 
     return res;
 }
@@ -104,10 +104,15 @@ int main () {
     pos.x = 10;
     pos.y = 12;
     pos.z = 50;
-    float pitch = -90;
+    float pitch = 20;
     float yaw = 45;
     auto start = std::chrono::high_resolution_clock::now();
-    getNextBox(yaw, pitch, pos);
+    pos = getNextBox(yaw, pitch, pos);
+    // cout << pos.x space << pos.y space << pos.z << endl;
+
+    pos = getNextBox(yaw,pitch,pos);
+    // cout << pos.x space << pos.y space << pos.z << endl;
+
     auto finish = std::chrono::high_resolution_clock::now();
     cout << std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() << endl;
 
