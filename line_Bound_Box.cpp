@@ -26,20 +26,20 @@ position getNextBox(float yaw, float pitch, position pos) {
 
     float sin_yaw = sin(yaw * degs_to_rads);
     float cos_yaw = cos(yaw * degs_to_rads);
-    float sin_pitch = cos(pitch * degs_to_rads);
+    float sin_pitch = sin(pitch * degs_to_rads);
 
     float x_hypot_length = INT_MAX;
     if (yaw < 90 or yaw > 270) {
-        x_hypot_length = ((floor(pos.x / bound_size + 1) * bound_size) - pos.x) / sin_yaw;
-    } else if (yaw < 90 or yaw > 270) {
-        x_hypot_length = (pos.x - (floor(pos.x / bound_size) * bound_size)) / sin_yaw;
+        x_hypot_length = ((floor(pos.x / bound_size + 1) * bound_size) - pos.x) / cos_yaw;
+    } else if (yaw > 90 and yaw < 270) {
+        x_hypot_length = (pos.x - (floor(pos.x / bound_size) * bound_size)) / cos_yaw;
     }
 
     float y_hypot_length = INT_MAX;
     if (yaw < 180) {
-        y_hypot_length = ((floor(pos.y / bound_size + 1) * bound_size) - pos.y) / cos_yaw;
+        y_hypot_length = ((floor(pos.y / bound_size + 1) * bound_size) - pos.y) / sin_yaw;
     } else if (yaw > 180) {
-        y_hypot_length = (pos.y - (floor(pos.y / bound_size) * bound_size)) / cos_yaw;
+        y_hypot_length = (pos.y - (floor(pos.y / bound_size) * bound_size)) / sin_yaw;
     }
 
     float z_hypot_length = INT_MAX;
@@ -53,21 +53,25 @@ position getNextBox(float yaw, float pitch, position pos) {
     hypot_length = min(hypot_length, abs(y_hypot_length));
     hypot_length = min(hypot_length, abs(z_hypot_length));
 
+    cout << x_hypot_length space << y_hypot_length space << z_hypot_length space << hypot_length << endl;
+
     position res;
 
     if (abs(x_hypot_length) == hypot_length) {
-        res.x = round(pos.x + sin_yaw * hypot_length);
-        res.y = (pos.y + cos_yaw * hypot_length);
+        res.x = round(pos.x + cos_yaw * hypot_length);
+        res.y = (pos.y + sin_yaw * hypot_length);
         res.z = (pos.z + sin_pitch * hypot_length);
     } else if (abs(y_hypot_length) == hypot_length) {
-        res.x = (pos.x + sin_yaw * hypot_length);
-        res.y = round(pos.y + cos_yaw * hypot_length);
+        res.x = (pos.x + cos_yaw * hypot_length);
+        res.y = round(pos.y + sin_yaw * hypot_length);
         res.z = (pos.z + sin_pitch * hypot_length);
     } else {
-        res.x = (pos.x + sin_yaw * hypot_length);
-        res.y = (pos.y + cos_yaw * hypot_length);
+        res.x = (pos.x + cos_yaw * hypot_length);
+        res.y = (pos.y + sin_yaw * hypot_length);
         res.z = round(pos.z + sin_pitch * hypot_length);
     }
+
+    cout << res.x space << res.y space << res.z << endl;
 
     return res;
 }
@@ -97,11 +101,11 @@ struct cameraAngle {
 
 int main () {
     position pos;
-    pos.x = 5;
-    pos.y = 10;
-    pos.z = 2;
-    float pitch = 45;
-    float yaw = 80;
+    pos.x = 10;
+    pos.y = 12;
+    pos.z = 50;
+    float pitch = -90;
+    float yaw = 45;
     auto start = std::chrono::high_resolution_clock::now();
     getNextBox(yaw, pitch, pos);
     auto finish = std::chrono::high_resolution_clock::now();
