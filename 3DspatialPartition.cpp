@@ -42,18 +42,36 @@ position getNextBox(float yaw, float pitch, position pos) {
         y_hypot_length = (pos.y - (floor(pos.y / bound_size) * bound_size)) / sin_yaw;
     }
 
-    float hypot_length = min(abs(x_hypot_length), abs(y_hypot_length));
+    float z_hypot_length = INT_MAX;
+    if (pitch > 0) {
+        z_hypot_length = ((floor(pos.z / bound_size + 1) * bound_size) - pos.z) / sin_pitch;
+    } else if (pitch < 0) {
+        z_hypot_length = (pos.z - (floor(pos.z / bound_size) * bound_size)) / sin_pitch;
+    }
+
+    float hypot_length = abs(x_hypot_length);
+    hypot_length = min(hypot_length, abs(y_hypot_length));
+    hypot_length = min(hypot_length, abs(z_hypot_length));
+
+    // cout << x_hypot_length space << y_hypot_length space << z_hypot_length space << hypot_length << endl;
+
     position res;
 
     if (abs(x_hypot_length) == hypot_length) {
         res.x = round(pos.x + cos_yaw * hypot_length);
         res.y = (pos.y + sin_yaw * hypot_length);
         res.z = (pos.z + sin_pitch * hypot_length);
-    } else {
+    } else if (abs(y_hypot_length) == hypot_length) {
         res.x = (pos.x + cos_yaw * hypot_length);
         res.y = round(pos.y + sin_yaw * hypot_length);
         res.z = (pos.z + sin_pitch * hypot_length);
+    } else {
+        res.x = (pos.x + cos_yaw * hypot_length);
+        res.y = (pos.y + sin_yaw * hypot_length);
+        res.z = round(pos.z + sin_pitch * hypot_length);
     }
+
+    // cout << res.x space << res.y space << res.z << endl;
 
     return res;
 }
