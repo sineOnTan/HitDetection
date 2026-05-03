@@ -12,13 +12,7 @@ struct boundingBox {
     float getMaxZ() {return z + length_z;}
 };
 
-pair<bool, int> checkBoundingBoxIntercept(cameraAngle ray, boundingBox target) {
-    pair<bool,int> hitAndLength = {false, 0};
-
-    // For each edge check where the line intercepts.
-
-    set<position> interceptPoints;
-
+bool checkBoundingBoxIntercept(cameraAngle ray, boundingBox target) {
     // check X min
     float degs_to_rads = M_PI / 180.0f;
 
@@ -30,12 +24,12 @@ pair<bool, int> checkBoundingBoxIntercept(cameraAngle ray, boundingBox target) {
         auto intercept = ray.get_X_Intercept(target.x);
         if (intercept.y >= target.y and intercept.y <= target.getMaxY() and 
             intercept.z >= target.z and intercept.z <= target.getMaxZ()) 
-                interceptPoints.insert(intercept);
+                return true;
 
         intercept = ray.get_X_Intercept(target.getMaxX());
         if (intercept.y >= target.y and intercept.y <= target.getMaxY() and 
             intercept.z >= target.z and intercept.z <= target.getMaxZ()) 
-                interceptPoints.insert(intercept);
+                return true;
     }
 
     // checks y intercepts
@@ -43,12 +37,12 @@ pair<bool, int> checkBoundingBoxIntercept(cameraAngle ray, boundingBox target) {
         auto intercept = ray.get_Y_Intercept(target.y);
         if (intercept.y >= target.y and intercept.y <= target.getMaxY() and 
             intercept.z >= target.z and intercept.z <= target.getMaxZ()) 
-                interceptPoints.insert(intercept);
+                return true;
 
         intercept = ray.get_Y_Intercept(target.getMaxY());
         if (intercept.x >= target.x and intercept.x <= target.getMaxX() and 
             intercept.z >= target.z and intercept.z <= target.getMaxZ()) 
-                interceptPoints.insert(intercept);
+                return true;
     }
 
     // checks z intercepts
@@ -56,16 +50,13 @@ pair<bool, int> checkBoundingBoxIntercept(cameraAngle ray, boundingBox target) {
         auto intercept = ray.get_Z_Intercept(target.z);
         if (intercept.y >= target.y and intercept.y <= target.getMaxY() and 
             intercept.z >= target.z and intercept.z <= target.getMaxZ()) 
-                interceptPoints.insert(intercept);
+                return true;
 
         intercept = ray.get_Z_Intercept(target.getMaxZ());
         if (intercept.x >= target.x and intercept.x <= target.getMaxX() and 
             intercept.y >= target.y and intercept.y <= target.getMaxY()) 
-                interceptPoints.insert(intercept);
+                return true;
     }
 
-
-
-
-
+    return false;
 }
