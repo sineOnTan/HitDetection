@@ -20,7 +20,7 @@ struct cameraAngle {
         float tan_yaw = tan(this->yaw * degs_to_rads);
         float tan_pitch = tan(this->pitch * degs_to_rads);
 
-        if (this->yaw != 0 or this->yaw != 180) {
+        if (this->yaw != 0 and this->yaw != 180) {
             float y = tan_yaw * (x - this->pos.x) + this->pos.y;
             float z = tan_pitch * sqrt(pow(this->pos.x - this->pos.x, 2) + pow(y - this->pos.y, 2)) + this->pos.z;
             return {x, y, z};
@@ -33,9 +33,24 @@ struct cameraAngle {
         float tan_yaw = tan(this->yaw * degs_to_rads);
         float tan_pitch = tan(this->pitch * degs_to_rads);
 
-        if (this->yaw != 90 or this->yaw != 270) {
+        if (this->yaw != 90 and this->yaw != 270) {
             float x = (y - this->pos.y) / tan_yaw + this->pos.x;
             float z = tan_pitch * sqrt(pow(this->pos.x - this->pos.x, 2) + pow(y - this->pos.y, 2)) + this->pos.z;
+            return {x, y, z};
+        } else return {-1, -1, -1};
+    }
+
+    position get_Z_Intercept(float z) {
+        float degs_to_rads = M_PI / 180.0f;
+
+        float cos_yaw = cos(this->yaw * degs_to_rads);
+        float sin_yaw = sin(this->yaw * degs_to_rads);
+        float tan_pitch = tan(this->pitch * degs_to_rads);
+
+        if (this->yaw != 90 or this->yaw != 270) {
+            float flat_hypot = (z - this->pos.z) / tan_pitch;
+            float x = cos_yaw * flat_hypot + this->pos.x;
+            float y = sin_yaw * flat_hypot + this->pos.y;
             return {x, y, z};
         } else return {-1, -1, -1};
     }
