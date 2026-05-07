@@ -1,12 +1,5 @@
 #include <bits/stdc++.h>
-
-struct position {
-    float x;
-    float y;
-    float z;
-
-    bool isNULL() {return x == -1 and y == -1 and z == -1;}
-};
+#include "position.cpp"
 
 struct cameraAngle {
     float yaw; // Horizontal (a number from 0-360) - 0 increasing x axis

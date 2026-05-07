@@ -1,4 +1,5 @@
-#include <bits/stdc++.h>
+#include "cameraAngle.cpp"
+#include "entity.cpp"
 using namespace std;
 #define space << " "
 
@@ -7,16 +8,6 @@ int max_coords = 1e4;
 int min_coords = 0;
 
 int bound_size = 1e2;
-
-struct object {
-    // Some filler for how objects are stored
-};
-
-struct position {
-    float x;
-    float y;
-    float z;
-};
 
 // The unique ranges for yaw and pitch are to avoid division by 0 problems
 // Aims to find the smallest hypotenuse to exit a plane defined by the bounding box then 
@@ -65,38 +56,26 @@ bool checkContinuePath(position pos) {
     else return true;
 }
 
-struct cameraAngle {
-    float yaw; // Horizontal (a number from 0-360) 0 is forward with rotation clockwise
-    float pitch; // Vertical (-90 [straight up] to 90 [straight down])
-    position pos;
+// ##########################
+// small test that can be run
+// ##########################
+//
+// int main () {
+//     position pos;
+//     pos.x = 10;
+//     pos.y = 12;
+//     pos.z = 50;
+//     float pitch = 20;
+//     float yaw = 45;
+//     auto start = std::chrono::high_resolution_clock::now();
+//     pos = getNextBox(yaw, pitch, pos);
+//     // cout << pos.x space << pos.y space << pos.z << endl;
 
-    vector<object> checkCollisions() {
-        auto cur_pos = this->pos;
-        vector<object> res;
-        while(checkContinuePath(cur_pos)) {
-            // Check entities in partition;
-            cur_pos = getNextBox(yaw, pitch, pos);
-        }
-        return res;
-    }
-};
+//     pos = getNextBox(yaw,pitch,pos);
+//     // cout << pos.x space << pos.y space << pos.z << endl;
 
-int main () {
-    position pos;
-    pos.x = 10;
-    pos.y = 12;
-    pos.z = 50;
-    float pitch = 20;
-    float yaw = 45;
-    auto start = std::chrono::high_resolution_clock::now();
-    pos = getNextBox(yaw, pitch, pos);
-    // cout << pos.x space << pos.y space << pos.z << endl;
+//     auto finish = std::chrono::high_resolution_clock::now();
+//     cout << std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() << endl;
 
-    pos = getNextBox(yaw,pitch,pos);
-    // cout << pos.x space << pos.y space << pos.z << endl;
-
-    auto finish = std::chrono::high_resolution_clock::now();
-    cout << std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count() << endl;
-
-    return 0;
-}
+//     return 0;
+// }
